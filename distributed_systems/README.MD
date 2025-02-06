@@ -1,6 +1,8 @@
 <h1 align="center">Курс "Распределенные системы"</h1>
 
-<h2 align="center">Построение сервиcа связанного с ВКР: "Идентификация искусственно сгенерированных текстов: разработка методов для обеспечения информационной достоверности"</h2>
+<h2 align="center">Построение сервиcа связанного с ВКР: 
+
+"Идентификация искусственно сгенерированных текстов: разработка методов для обеспечения информационной достоверности"</h2>
 
 Для выполнения ДЗ ниже приложена инструкция по пошаговому развертыванию сервиса на пустом Linux-сервере, в частности я арендую такой тут: <a href="https://timeweb.cloud" target="_blank">timeweb.cloud</a>  
 
@@ -22,8 +24,7 @@
 
 <b>1.4 Переключаемся на admin </b>
 
-<code>
-su -- admin
+<code>su -- admin
 cd ~/</code>
 
 
@@ -31,14 +32,12 @@ cd ~/</code>
 
 <b>2.1 Скачиваем Miniconda, Запускаем установку</b>
 
-<code>
-wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+<code>wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 bash Miniconda3-latest-Linux-x86_64.sh </code>
 
 <b>2.2 Добавляем переменную окружения </b>
 
-<code>
-nano ~/.bashrc
+<code>nano ~/.bashrc
 PATH="$HOME/miniconda3/bin:$PATH" </code>
 
 <b>2.3 Применим изменения в оболочке </b>
@@ -55,8 +54,7 @@ PATH="$HOME/miniconda3/bin:$PATH" </code>
 
 <b>2.6 Проверим python и conda  </b>
 
-<code>
-which python
+<code>which python
 conda --version </code>
 
 <b>2.7 Создадим и виртуальное окружение без библиотек  </b>
@@ -65,15 +63,13 @@ conda --version </code>
 
 <b>2.8 Установим poetry для управления зависимостями и проверим установку  </b>
 
-<code>
-pip install poetry
+<code>pip install poetry
 poetry config virtualenvs.create false
 poetry --version</code>
 
 <b>2.9 Установим Docker  </b>
 
-<code>
-sudo apt-get update
+<code>sudo apt-get update
 sudo apt-get install ca-certificates curl
 sudo install -m 0755 -d /etc/apt/keyrings
 sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
@@ -147,7 +143,7 @@ newgrp docker
 
 <b>4.3 Запускаем контейнер, в переменную WORKERS указываем кол-во воркеров  </b>
 
-<code>docker run -e WORKERS=2 -d -p 8000:80 --name fastapi_container fastapi_app </code> 
+<code>docker run -e WORKERS=8 -d -p 8000:80 --name fastapi_container fastapi_app </code> 
 
 <b>4.4 Слушаем, что на порту сервера  </b>
 
@@ -164,7 +160,3 @@ newgrp docker
 <b>4.7 # Модель крутится на 8000 порту</b>
 
 <code>http://103.74.94.14:8000 </code> 
-
-
-
-
