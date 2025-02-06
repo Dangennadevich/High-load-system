@@ -127,7 +127,7 @@ newgrp docker
 
 <b>3.4 Добавим зависимости  </b>
 
-<code>poetry add mlflow requests aiohttp aiohttp-jinja2 pika pandas fastapi uvicorn </code> 
+<code>poetry add mlflow requests aiohttp aiohttp-jinja2 pika pandas fastapi uvicorn gunicorn</code> 
 
 
 

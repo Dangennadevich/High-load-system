@@ -14,5 +14,5 @@ COPY . /app
 # Указываем переменные окружения
 ENV WORKERS=4
 
-# Кманды для запуска FastAPI
-CMD ["sh", "-c", "poetry run uvicorn main:app --host 0.0.0.0 --port 80 --workers $WORKERS"]
+# Команды для запуска сервиса
+CMD ["sh", "-c", "poetry run gunicorn -w $WORKERS -k uvicorn.workers.UvicornWorker main:app --bind 0.0.0.0:80"]
