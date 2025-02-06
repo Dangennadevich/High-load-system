@@ -1,71 +1,84 @@
 <h1 align="center">Курс "Распределенные системы"</h1>
 
-<h2 align="center">Построение сервсина связанного с темой ВКР: "Идентификация искусственно сгенерированных текстов: разработка методов для обеспечения информационной достоверности"</h2>
+<h2 align="center">Построение сервиcа связанного с ВКР: "Идентификация искусственно сгенерированных текстов: разработка методов для обеспечения информационной достоверности"</h2>
 
-Для выполнения ДЗ будет приложена инструкция по пошаговому развертыванию сервиса на пустом Linux-сервере, в частности я арендую такой тут: timeweb.cloud
+Для выполнения ДЗ ниже приложена инструкция по пошаговому развертыванию сервиса на пустом Linux-сервере, в частности я арендую такой тут: <a href="https://timeweb.cloud" target="_blank">timeweb.cloud</a>  
+
+
 
 <h3 align="center">1. Настройка инфраструктуры сервера</h3>
 
 <b>1.1 Закинем публичный ключ на сервер </b>
+
 <code>ssh-copy-id -i ~/.ssh/id_rsa.pub root@server_ip </code>
 
 <b>1.2 Создаем пользователя </b>
+
 <code>adduser admin</code>
 
 <b>1.3 Даём права sudo </b>
+
 <code>usermod -aG sudo admin  </code>
 
 <b>1.4 Переключаемся на admin </b>
-<code>su -- admin
+
+<code>
+su -- admin
 cd ~/</code>
 
 
-####################
-# Установим Miniconda для локальной разработки
+<h3 align="center">2. Настройка сервера для разработки (Miniconda, Poetry, Docker, ect)</h3>
 
-# Скачиваем Miniconda, Запускаем установку
+<b>2.1 Скачиваем Miniconda, Запускаем установку</b>
+
+<code>
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-bash Miniconda3-latest-Linux-x86_64.sh
+bash Miniconda3-latest-Linux-x86_64.sh </code>
 
-# Добавляем переменную окружения 
+<b>2.2 Добавляем переменную окружения </b>
+
+<code>
 nano ~/.bashrc
-PATH="$HOME/miniconda3/bin:$PATH"
+PATH="$HOME/miniconda3/bin:$PATH" </code>
 
-# После установки активируем conda
-source ~/.bashrc
+<b>2.3 Применим изменения в оболочке </b>
 
-# тут может потребоваться открыть новый терминал и/или перезапустить bash exec bash 
-conda init
+<code>source ~/.bashrc </code>
 
-# Удалим архив
-rm Miniconda3-latest-Linux-x86_64.sh
+<b>2.4 инициализируем Conda  </b>
 
-# Проверим python и conda
+<code>conda init </code>
+
+<b>2.5 Удалим архив  </b>
+
+<code>rm Miniconda3-latest-Linux-x86_64.sh </code>
+
+<b>2.6 Проверим python и conda  </b>
+
+<code>
 which python
-conda --version
+conda --version </code>
 
-# Создадим и виртуальное окружение без библиотек
-conda create --no-default-packages -n train_env python=3.11
+<b>2.7 Создадим и виртуальное окружение без библиотек  </b>
 
-####################
-# Установим poetry для управления зависимостями и проверим установку
+<code>conda create --no-default-packages -n train_env python=3.11 </code>
 
+<b>2.8 Установим poetry для управления зависимостями и проверим установку  </b>
+
+<code>
 pip install poetry
 poetry config virtualenvs.create false
-poetry --version
+poetry --version</code>
 
+<b>2.9 Установим Docker  </b>
 
-####################
-# Docker # 
-
-# Устанавливаем Docker
+<code>
 sudo apt-get update
 sudo apt-get install ca-certificates curl
 sudo install -m 0755 -d /etc/apt/keyrings
 sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
 sudo chmod a+r /etc/apt/keyrings/docker.asc
 
-# Add the repository to Apt sources:
 echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
   $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
@@ -74,71 +87,84 @@ sudo apt-get update
 
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-# https://docs.docker.com/engine/install/linux-postinstall/
 sudo groupadd docker
 sudo usermod -aG docker $USER
 newgrp docker
+</code>
 
-# Настроим DNS-серверы для всех контейнеров
-sudo nano /etc/docker/daemon.json
+<b>2.10 Настроим DNS-серверы для всех контейнеров, добавить в файл </b>
 
-# Добавить без кавычек
+<code>sudo nano /etc/docker/daemon.json
 
-"
 {
   "dns": ["8.8.8.8", "8.8.4.4"]
-}
-"
-
-# Перезапустите Docker-демон:
-sudo systemctl restart docker
-
-# Проверим установку
-docker run hello-world
-
-####################
-
-# Установим netstat
-sudo apt install net-tools
+} </code>
 
 
-######################################## 2. Настройка окружения для обучения модели
+<b>2.11 Перезапустите Docker-демон  </b>
 
-# Создадим проект
-mkdir ~/project && cd ~/project/
+<code> sudo systemctl restart docker </code>
 
-# Активируем окружение для обучения модели
-conda activate train_env
+<b>2.12 Проверим установку docker </b>
 
-# Выполнем инициализацию poetry 
-poetry init
+<code> docker run hello-world </code>
 
-# Добавим зависимости
-poetry add mlflow requests aiohttp aiohttp-jinja2 pika pandas fastapi uvicorn
+<b>2.13 Установим netstat </b>
+
+<code> sudo apt install net-tools </code>
 
 
-######################################## 3. Поднимаем сервис
 
-# Создаем Dockerfile
+<h3 align="center">3. Настройка окружения для обучения модели </h3>
 
-# Создаем образ
-docker build -t fastapi_app .
+<b>3.1 Активируем окружение для обучения модели </b>
 
-# Запускаем контейнер
-docker run -d -p 8000:80 --name fastapi_container fastapi_app
+<code>conda activate train_env </code> 
 
-# Устанавливаем net-tools, ушаем что на порту сервера
-sudo apt install net-tools
-netstat -tuln | grep :8000
+<b>3.2 Команды ниже выполняем из директории project </b>
 
-# Смотрим логи контейнера
-docker logs fastapi_container
+<code>cd ~/project/ </code> 
 
-# на случай перезапускка
-docker rm fastapi_container
+<b>3.3 Выполнем инициализацию poetry  </b>
 
-# Отправляем запрос в модель, в примере временный публичный IP
-curl -X POST "http://103.74.94.14:8000/predict" -H "Content-Type: application/json" -d '{"text": "Привет как дела?"}'
+<code>poetry init </code> 
 
-# Модель крутится на 8000 порту
-http://103.74.94.14:8000
+<b>3.4 Добавим зависимости  </b>
+
+<code>poetry add mlflow requests aiohttp aiohttp-jinja2 pika pandas fastapi uvicorn </code> 
+
+
+
+<h3 align="center">4. Поднимаем сервис </h3>
+
+<b>4.1 Команды ниже выполняем из директории project </b>
+
+<code>cd ~/project/ </code> 
+
+<b>4.2 Создаем docker образ  </b>
+
+<code>docker build -t fastapi_app . </code> 
+
+<b>4.3 Запускаем контейнер, в переменную WORKERS указываем кол-во воркеров  </b>
+
+<code>docker run -e WORKERS=2 -d -p 8000:80 --name fastapi_container fastapi_app </code> 
+
+<b>4.4 Слушаем, что на порту сервера  </b>
+
+<code>netstat -tuln | grep :8000 </code> 
+
+<b>4.5 Смотрим логи контейнера</b>
+
+<code>docker logs fastapi_container </code> 
+
+<b>4.6 Отправляем запрос в модель, в примере временный публичный IP</b>
+
+<code>curl -X POST "http://103.74.94.14:8000/predict" -H "Content-Type: application/json" -d '{"text": "Привет как дела?"}' </code> 
+
+<b>4.7 # Модель крутится на 8000 порту</b>
+
+<code>http://103.74.94.14:8000 </code> 
+
+
+
+
