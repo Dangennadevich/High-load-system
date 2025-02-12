@@ -30,44 +30,55 @@ cd ~/</code>
 
 <h3 align="center">2. Настройка сервера для разработки (Miniconda, Poetry, Docker, ect)</h3>
 
-<b>2.1 Скачиваем Miniconda, Запускаем установку</b>
+<b>2.1 Устанавливаем Git</b>
+
+<code>sudo apt update
+sudo apt install git </code>
+
+<b>2.2 Копируем репозиторий в папку  ~/project/</b>
+
+<code>mkdir project && cd project </code>
+<code>git clone -b checkpoint_2 https://github.com/Dangennadevich/HSE_Homeworks.git </code>
+<code>cd .. </code>
+
+<b>2.3 Скачиваем Miniconda, Запускаем установку</b>
 
 <code>wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 bash Miniconda3-latest-Linux-x86_64.sh </code>
 
-<b>2.2 Добавляем переменную окружения </b>
+<b>2.4 Добавляем переменную окружения </b>
 
 <code>nano ~/.bashrc
 PATH="$HOME/miniconda3/bin:$PATH" </code>
 
-<b>2.3 Применим изменения в оболочке </b>
+<b>2.5 Применим изменения в оболочке </b>
 
 <code>source ~/.bashrc </code>
 
-<b>2.4 инициализируем Conda  </b>
+<b>2.6 инициализируем Conda  </b>
 
 <code>conda init </code>
 
-<b>2.5 Удалим архив  </b>
+<b>2.7 Удалим архив  </b>
 
 <code>rm Miniconda3-latest-Linux-x86_64.sh </code>
 
-<b>2.6 Проверим python и conda  </b>
+<b>2.8 Проверим python и conda  </b>
 
 <code>which python
 conda --version </code>
 
-<b>2.7 Создадим и виртуальное окружение без библиотек  </b>
+<b>2.9 Создадим и виртуальное окружение без библиотек  </b>
 
 <code>conda create --no-default-packages -n train_env python=3.11 </code>
 
-<b>2.8 Установим poetry для управления зависимостями и проверим установку  </b>
+<b>2.10 Установим poetry для управления зависимостями и проверим установку  </b>
 
 <code>pip install poetry
 poetry config virtualenvs.create false
 poetry --version</code>
 
-<b>2.9 Установим Docker  </b>
+<b>2.11 Установим Docker  </b>
 
 <code>sudo apt-get update
 sudo apt-get install ca-certificates curl
@@ -88,7 +99,7 @@ sudo usermod -aG docker $USER
 newgrp docker
 </code>
 
-<b>2.10 Настроим DNS-серверы для всех контейнеров, добавить в файл </b>
+<b>2.12 Настроим DNS-серверы для всех контейнеров, добавить в файл </b>
 
 <code>sudo nano /etc/docker/daemon.json
 
@@ -97,15 +108,15 @@ newgrp docker
 } </code>
 
 
-<b>2.11 Перезапустите Docker-демон  </b>
+<b>2.13 Перезапустите Docker-демон  </b>
 
 <code> sudo systemctl restart docker </code>
 
-<b>2.12 Проверим установку docker </b>
+<b>2.14 Проверим установку docker </b>
 
 <code> docker run hello-world </code>
 
-<b>2.13 Установим netstat </b>
+<b>2.15 Установим netstat </b>
 
 <code> sudo apt install net-tools </code>
 
@@ -121,13 +132,9 @@ newgrp docker
 
 <code>cd ~/project/ </code> 
 
-<b>3.3 Выполнем инициализацию poetry  </b>
+<b>3.3 Выполнем инициализацию poetry </b>
 
-<code>poetry init </code> 
-
-<b>3.4 Добавим зависимости  </b>
-
-<code>poetry add mlflow requests aiohttp aiohttp-jinja2 pika pandas fastapi uvicorn gunicorn</code> 
+<code>poetry install --no-root </code> 
 
 
 
@@ -139,24 +146,20 @@ newgrp docker
 
 <b>4.2 Создаем docker образ  </b>
 
-<code>docker build -t fastapi_app . </code> 
+<code>docker-compose build </code> 
 
-<b>4.3 Запускаем контейнер, в переменную WORKERS указываем кол-во воркеров  </b>
+<b>4.3 Запускаем сервисы  </b>
 
-<code>docker run -e WORKERS=8 -d -p 8000:80 --name fastapi_container fastapi_app </code> 
+<code>docker-compose up </code> 
 
 <b>4.4 Слушаем, что на порту сервера  </b>
 
 <code>netstat -tuln | grep :8000 </code> 
 
-<b>4.5 Смотрим логи контейнера</b>
-
-<code>docker logs fastapi_container </code> 
-
-<b>4.6 Отправляем запрос в модель, в примере временный публичный IP</b>
+<b>4.5 Отправляем запрос в модель, в примере временный публичный IP</b>
 
 <code>curl -X POST "http://103.74.94.14:8000/predict" -H "Content-Type: application/json" -d '{"text": "Привет как дела?"}' </code> 
 
-<b>4.7 # Модель крутится на 8000 порту</b>
+<b>4.6 # Модель крутится на 8000 порту</b>
 
 <code>http://103.74.94.14:8000 </code> 
