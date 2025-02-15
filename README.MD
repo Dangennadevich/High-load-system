@@ -12,6 +12,7 @@
 * 4) Поднимаем docker-compose
 * 5) Проверяем работу сервисов
 
+
 <h3 align="center">1. Настройка инфраструктуры сервера</h3>
 
 <b>1.1 Закинем публичный ключ на сервер </b>
@@ -27,6 +28,7 @@
 <code>su -- admin</code>
 
 <code>cd ~/</code>
+
 
 <h3 align="center">2. Настройка сервера для разработки (Miniconda, Poetry, Docker, ect)</h3>
 
@@ -107,7 +109,6 @@ sudo chmod a+r /etc/apt/keyrings/docker.gpg</code>
 <code>sudo usermod -aG docker $USER</code>
 <code>newgrp docker</code>
 
-
 <b>2.12 Настроим DNS-серверы для всех контейнеров, добавить в файл </b>
 
 <code>sudo nano /etc/docker/daemon.json</code>
@@ -116,7 +117,6 @@ sudo chmod a+r /etc/apt/keyrings/docker.gpg</code>
   "dns": ["8.8.8.8", "8.8.4.4"]
 }</code>
 
-
 <b>2.13 Перезапустите Docker-демон  </b>
 
 <code> sudo systemctl restart docker </code>
@@ -124,7 +124,6 @@ sudo chmod a+r /etc/apt/keyrings/docker.gpg</code>
 <b>2.14 Проверим установку docker </b>
 
 <code> docker run hello-world </code>
-
 
 
 <h3 align="center">3. Настройка окружения для обучения модели </h3>
@@ -145,7 +144,7 @@ sudo chmod a+r /etc/apt/keyrings/docker.gpg</code>
 
 <code>nano ~/project/.env</code>
 
-<code>nAWS_SECRET_ACCESS_KEY = 
+<code>AWS_SECRET_ACCESS_KEY = 
 AWS_ACCESS_KEY_ID = 
 POSTGRES_PASSWORD =
 </code> 
@@ -165,6 +164,7 @@ POSTGRES_PASSWORD =
 
 <code>docker-compose up </code> 
 
+
 <h3 align="center">5. Проверяем работу сервисов </h3>
 
 <b>5.1 Проверим запущены ли контейнеры</b>
@@ -177,8 +177,9 @@ POSTGRES_PASSWORD =
 
 <b>5.3 Отправляем запрос на сервис. Ожидается ответ в виде числа.</b>
 
+Ожидается ответ в виде числа, которое может быть оценкой вероятности того, что текст был сгенерирован моделью
+
 <code>curl -X POST "http://92.255.111.116:8000/predict" -H "Content-Type: application/json" -d '{"text": "Привет как дела?"}' </code> 
-# Ожидается ответ в виде числа, которое может быть оценкой вероятности того, что текст был сгенерирован моделью
 
 <b>5.4 # MlFlow крутится на 5050 порту</b>
 
@@ -189,8 +190,9 @@ POSTGRES_PASSWORD =
 <code>docker exec -it mlflow-service bash
 env | grep MLFLOW </code> 
 
-<code> apt update && apt install postgresql-client -y
-psql -h postgres_db -U postgres -d mlflow_db -p 5432</code> 
+<code>apt update && apt install postgresql-client -y</code> 
+
+<code>psql -h postgres_db -U postgres -d mlflow_db -p 5432</code> 
 
 <b>5.6 Проверить подключение к PostgeSQL с сервера</b>
 
@@ -199,6 +201,9 @@ psql -h postgres_db -U postgres -d mlflow_db -p 5432</code>
 <b>5.7 Проверить логи контейнеров</b>
 
 <code>docker logs nginx_proxy --tail 50</code> 
+
 <code>docker logs mlflow-service --tail 50</code> 
+
 <code>docker logs postgres_db --tail 50</code> 
+
 <code>docker logs fastapi_container --tail 50</code> 
