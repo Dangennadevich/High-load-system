@@ -5,7 +5,7 @@ services:
     build: .
     container_name: fastapi_container
     environment:
-      - WORKERS=8
+      - WORKERS=8 # Кол-во workers для Guvicorn
     ports:
       - "8000:80"
     restart: always
@@ -23,7 +23,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres-db-volume:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql # Создадим БД для MLFLOW
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "postgres"]
       interval: 30s

@@ -6,11 +6,11 @@
 
 Для выполнения ДЗ ниже приложена инструкция по пошаговому развертыванию сервиса на пустом Linux-сервере, в частности я арендую такой тут: <a href="https://timeweb.cloud" target="_blank">timeweb.cloud</a>  
 
-* 1. Настройка инфраструктуры сервера
-* 2. Настройка сервера для разработки (Miniconda, Poetry, Docker, ect)
-* 3. Настройка окружения для обучения модели
-* 4. Поднимаем docker-compose
-* 5. Проверяем работу сервисов
+* 1) Настройка инфраструктуры сервера
+* 2) Настройка сервера для разработки (Miniconda, Poetry, Docker, ect)
+* 3) Настройка окружения для обучения модели
+* 4) Поднимаем docker-compose
+* 5) Проверяем работу сервисов
 
 <h3 align="center">1. Настройка инфраструктуры сервера</h3>
 
@@ -20,10 +20,13 @@
 
 <b>1.2 Создаем пользователя и даём права sudo</b>
 
-<code>adduser admin
-usermod -aG sudo admin  
-su -- admin
-cd ~/</code>
+<code>adduser admin</code>
+
+<code>usermod -aG sudo admin</code>
+
+<code>su -- admin</code>
+
+<code>cd ~/</code>
 
 <h3 align="center">2. Настройка сервера для разработки (Miniconda, Poetry, Docker, ect)</h3>
 
@@ -41,9 +44,11 @@ cd ~/</code>
 
 <b>2.3 Скачиваем Miniconda, Запускаем установку</b>
 
-<code>cd ~/
-wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-bash Miniconda3-latest-Linux-x86_64.sh </code>
+<code>cd ~/</code>
+
+<code>wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh</code>
+
+<code>bash Miniconda3-latest-Linux-x86_64.sh</code>
 
 <b>2.4 Добавляем переменную окружения </b>
 
@@ -65,40 +70,43 @@ bash Miniconda3-latest-Linux-x86_64.sh </code>
 
 <b>2.8 Проверим python и conda  </b>
 
-<code>which python
-conda --version </code>
+<code>which python</code>
+<code>conda --version</code>
 
 <b>2.9 Установим poetry для управления зависимостями и проверим установку  </b>
 
-<code>pip install poetry
-poetry config virtualenvs.create false
-poetry --version</code>
+<code>pip install poetry</code>
+
+<code>poetry config virtualenvs.create false</code>
+
+<code>poetry --version</code>
 
 <b>2.10 Создадим и виртуальное окружение без библиотек  </b>
 
-<code>conda create --no-default-packages -n train_env python=3.11
-conda activate train_env</code>
+<code>conda create --no-default-packages -n train_env python=3.11</code>
+<code>conda activate train_env</code>
 
 <b>2.11 Установим Docker  </b>
 
 <code>sudo apt-get update
-sudo apt-get install ca-certificates curl
+sudo apt-get install ca-certificates curl gnupg
 sudo install -m 0755 -d /etc/apt/keyrings
-sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-sudo chmod a+r /etc/apt/keyrings/docker.asc</code>
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg</code>
 
 <code>echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
   $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
-  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt-get update</code>
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null</code>
 
-<code>sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin</code>
+<code>sudo apt-get update</code>
 
-<code>sudo groupadd docker
-sudo usermod -aG docker $USER
-newgrp docker
-</code>
+<code>sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-compose </code>
+
+<code>sudo groupadd docker</code>
+<code>sudo usermod -aG docker $USER</code>
+<code>newgrp docker</code>
+
 
 <b>2.12 Настроим DNS-серверы для всех контейнеров, добавить в файл </b>
 
@@ -129,13 +137,13 @@ newgrp docker
 
 <code>cd ~/project/ </code> 
 
-<b>3.3 Выполнем инициализацию poetry </b>
+<b>3.3 Выполнем инициализацию poetry, устанавливаем библиотеки</b>
 
 <code>poetry install --no-root </code> 
 
-<b>3.4 Нужно создать файл .env с кредами </b>
+<b>3.4 Создаем файл .env с кредами </b>
 
-<code>nano ~/</code>
+<code>nano ~/project/.env</code>
 
 <code>nAWS_SECRET_ACCESS_KEY = 
 AWS_ACCESS_KEY_ID = 
@@ -163,18 +171,18 @@ POSTGRES_PASSWORD =
 
 <code>docker ps </code> 
 
-<b>5.2 Сервис предсказания сгенерирован ли текст моделью крутится на 8000 порту. В примере временный публичный IP</b>
+<b>5.2 Сервис предсказания сгенерирован ли текст моделью крутится на 8000 порту. В примере временный публичный IP (временный)</b>
 
-<code>http://91.186.198.193:8000 </code> 
+<code>http://92.255.111.116:8000</code> 
 
 <b>5.3 Отправляем запрос на сервис. Ожидается ответ в виде числа.</b>
 
-<code>curl -X POST "http://91.186.198.193:8000/predict" -H "Content-Type: application/json" -d '{"text": "Привет как дела?"}' </code> 
+<code>curl -X POST "http://92.255.111.116:8000/predict" -H "Content-Type: application/json" -d '{"text": "Привет как дела?"}' </code> 
 # Ожидается ответ в виде числа, которое может быть оценкой вероятности того, что текст был сгенерирован моделью
 
 <b>5.4 # MlFlow крутится на 5050 порту</b>
 
-<code>http://91.186.198.193:5050 </code> 
+<code>http://92.255.111.116:5050</code> 
 
 <b>5.5 Проверим переменные окружения в контейнере MlFlow и подключение к postgres</b>
 
@@ -186,7 +194,7 @@ psql -h postgres_db -U postgres -d mlflow_db -p 5432</code>
 
 <b>5.6 Проверить подключение к PostgeSQL с сервера</b>
 
-<code>psql -h localhost -U admin -d mlflow_db -p 5432 </code> 
+<code>psql -h localhost -U postgres -d mlflow_db -p 5432 </code> 
 
 <b>5.7 Проверить логи контейнеров</b>
 
