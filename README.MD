@@ -34,7 +34,9 @@ cd ~/</code>
 <b>2.2 Копируем репозиторий с проектом в папку ~/project/</b>
 
 <code>mkdir project && cd project </code>
+
 <code>git clone -b checkpoint_2 https://github.com/Dangennadevich/HSE_Homeworks.git </code>
+
 <code>mv HSE_Homeworks/* .</code>
 
 <b>2.3 Скачиваем Miniconda, Запускаем установку</b>
@@ -45,9 +47,9 @@ bash Miniconda3-latest-Linux-x86_64.sh </code>
 
 <b>2.4 Добавляем переменную окружения </b>
 
-<code>nano ~/.bashrc
+<code>nano ~/.bashrc</code>
 
-PATH="$HOME/miniconda3/bin:$PATH" </code>
+<code>PATH="$HOME/miniconda3/bin:$PATH" </code>
 
 <b>2.5 Применим изменения в оболочке </b>
 
@@ -83,29 +85,28 @@ conda activate train_env</code>
 sudo apt-get install ca-certificates curl
 sudo install -m 0755 -d /etc/apt/keyrings
 sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-sudo chmod a+r /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc</code>
 
-echo \
+<code>echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
   $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt-get update
+sudo apt-get update</code>
 
-sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+<code>sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin</code>
 
-sudo groupadd docker
+<code>sudo groupadd docker
 sudo usermod -aG docker $USER
 newgrp docker
 </code>
 
 <b>2.12 Настроим DNS-серверы для всех контейнеров, добавить в файл </b>
 
-<code>sudo nano /etc/docker/daemon.json
+<code>sudo nano /etc/docker/daemon.json</code>
 
-{
+<code>{
   "dns": ["8.8.8.8", "8.8.4.4"]
-} 
-</code>
+}</code>
 
 
 <b>2.13 Перезапустите Docker-демон  </b>
@@ -134,9 +135,9 @@ newgrp docker
 
 <b>3.4 Нужно создать файл .env с кредами </b>
 
-<code>nano ~/
+<code>nano ~/</code>
 
-AWS_SECRET_ACCESS_KEY = 
+<code>nAWS_SECRET_ACCESS_KEY = 
 AWS_ACCESS_KEY_ID = 
 POSTGRES_PASSWORD =
 </code> 
