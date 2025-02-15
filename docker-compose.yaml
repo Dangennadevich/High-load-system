@@ -16,16 +16,16 @@ services:
     env_file:
       - .env
     environment:
-      POSTGRES_USER: admin
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: admin
+      POSTGRES_DB: postgres
     ports:
       - "5432:5432"
     volumes:
       - postgres-db-volume:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "admin"]
+      test: ["CMD", "pg_isready", "-U", "postgres"]
       interval: 30s
       retries: 5
       start_period: 5s
@@ -43,14 +43,14 @@ services:
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       AWS_DEFAULT_REGION: ru-central1
-      MLFLOW_TRACKING_URI: postgresql://admin:${POSTGRES_PASSWORD}@postgres_db:5432/mlflow_db
+      MLFLOW_TRACKING_URI: postgresql://postgres:${POSTGRES_PASSWORD}@postgres_db:5432/mlflow_db
     command:
       - bash
       - -c
       - |
         pip install boto3 psycopg2-binary --quiet
         mlflow server --host 0.0.0.0 \
-            --backend-store-uri postgresql://admin:${POSTGRES_PASSWORD}@postgres_db:5432/mlflow_db \
+            --backend-store-uri postgresql://postgres:${POSTGRES_PASSWORD}@postgres_db:5432/mlflow_db \
             --default-artifact-root s3://graduate/mlflow --serve-artifacts
     expose:
       - "5000"
