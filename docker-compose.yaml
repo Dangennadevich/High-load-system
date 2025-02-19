@@ -73,9 +73,26 @@ services:
     depends_on:
       - fastapi_app
       - mlflow-service
+      - rabbitmq
     restart: always
+
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    container_name: "rabbitmq"
+    env_file:
+      - .env
+    ports:
+      - "15672:15672"  # Для доступа к Web UI
+      - "5672:5672"    # Для подключения RabbitMQ клиентов
+    volumes:
+      - "rabbitmq_data:/var/lib/rabbitmq"  # для постоянства данных
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
 
 volumes:
   postgres-db-volume:
   mlflow-data:
   nginx-logs:
+  rabbitmq_data:
+    driver: local

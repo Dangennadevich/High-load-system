@@ -90,16 +90,19 @@
 
 <b>2.11 Установим Docker  </b>
 
-<code>sudo apt-get update
-sudo apt-get install ca-certificates curl gnupg
+<code>
+sudo apt-get update
+sudo apt-get install ca-certificates curl
 sudo install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-sudo chmod a+r /etc/apt/keyrings/docker.gpg</code>
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc</code>
+
 
 <code>echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
   $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
-  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null</code>
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update</code>
 
 <code>sudo apt-get update</code>
 
@@ -179,7 +182,7 @@ POSTGRES_PASSWORD =
 
 Ожидается ответ в виде числа, которое может быть оценкой вероятности того, что текст был сгенерирован моделью
 
-<code>curl -X POST "http://92.255.111.116:8000/predict" -H "Content-Type: application/json" -d '{"text": "Привет как дела?"}' </code> 
+<code>curl -X POST "http://62.113.44.18:8000/predict" -H "Content-Type: application/json" -d '{"text": "Привет как дела?"}' </code> 
 
 <b>5.4 # MlFlow крутится на 5050 порту</b>
 

@@ -1,12 +1,70 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-import random
+from dotenv import load_dotenv
+
+import os
+import aio_pika
+import asyncio
+import json
+# import random
+import uuid
+
+load_dotenv()
+
+RABBITMQ_DEFAULT_USER = os.getenv("RABBITMQ_DEFAULT_USER")
+RABBITMQ_DEFAULT_PASS = os.getenv("RABBITMQ_DEFAULT_PASS")
+
+if not RABBITMQ_DEFAULT_USER or not RABBITMQ_DEFAULT_PASS:
+    raise ValueError("RABBITMQ_DEFAULT_USER and RABBITMQ_DEFAULT_PASS must be set in the .env file")
+
 
 app = FastAPI()
 
-# Модель для входных данных
 class TextInput(BaseModel):
+    '''Модель для входных данных'''
     text: str
+
+async def connect_to_rabbitmq():
+    '''Функция для подключения к RabbitMQ'''
+    return await aio_pika.connect_robust(
+        f"amqp://{RABBITMQ_DEFAULT_USER}:{RABBITMQ_DEFAULT_PASS}@rabbitmq/"
+    )
+
+async def send_message(channel, queue_name, message, correlation_id):
+    '''Функция для отправки сообщения в очередь
+    
+    :channel: Канал из подключения RabbitMQ
+    :queue_name: Очередь, куда будем отправлять сообщения
+    :message: Сообщение от пользователя для модели
+    :correlation_id: Уникальный ID посылки в RabbitMQ
+    '''
+    queue = await channel.declare_queue(queue_name, durable=True)
+    await channel.default_exchange.publish(
+        aio_pika.Message(
+            body=json.dumps(message).encode(),
+            correlation_id=correlation_id  # Добавляем корреляционный ID
+        ),
+        routing_key=queue.name,
+    )
+
+async def get_response(callback_queue, correlation_id):
+    '''Функция для получения ответа от сервера B в течение заданного времени
+
+    :callback_queue: Очередь, из которой берем ответ модели
+    :correlation_id: id запроса к модели
+    '''
+    try:
+        # Ожидаем сообщения из очереди с заданным тайм-аутом
+        message = await asyncio.wait_for(callback_queue.get())
+
+        # Обрабатываем сообщение
+        async with message.process():
+            if message.correlation_id == correlation_id:
+                return message.body.decode()
+            
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return f"An error occurred while waiting for response from server (correlation_id: {correlation_id})"
 
 @app.get("/")
 def read_root():
@@ -14,15 +72,31 @@ def read_root():
 
 # Маршрут для обработки POST-запроса
 @app.post("/predict")
-def predict(text_input: TextInput):
-    # Генерируем случайное значение от 0 до 1
-    random_value = random.random()
-    random_value = round(random_value, 3)
-    
-    # Возвращаем результат
-    return {"text": text_input.text, "Generated prob: ": random_value}
+async def predict(text_input: TextInput):
+    try:
 
-# Запуск сервера (для локального тестирования)
+        connection = await connect_to_rabbitmq()
+        channel = await connection.channel()
+
+        correlation_id = str(uuid.uuid4())
+        
+        message = {"text": text_input.text}
+
+        # Отправляем сообщение в очередь на сервер B
+        await send_message(channel, "tasks_pred_gen_txt", message, correlation_id)
+
+        # Создаем очередь для получения ответа от сервера B
+        result_queue = await channel.declare_queue("results_pred_gen_txt", durable=True)
+
+        # Ожидаем ответ от сервера B в очереди "results"
+        response = await get_response(result_queue, correlation_id)
+        
+        return {"text": text_input.text, "result": response}
+
+    finally:
+        await connection.close()
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
