@@ -6,7 +6,6 @@ import os
 import aio_pika
 import asyncio
 import json
-# import random
 import uuid
 
 load_dotenv()

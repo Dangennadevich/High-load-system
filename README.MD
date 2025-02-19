@@ -6,28 +6,20 @@
 
 Для выполнения ДЗ ниже приложена инструкция по пошаговому развертыванию сервиса на пустом Linux-сервере, в частности я арендую такой тут: <a href="https://timeweb.cloud" target="_blank">timeweb.cloud</a>  
 
-* 1) Настройка инфраструктуры сервера
+* 1) Создаем пользователя
 * 2) Настройка сервера для разработки (Miniconda, Poetry, Docker, ect)
 * 3) Настройка окружения для обучения модели
 * 4) Поднимаем docker-compose
 * 5) Проверяем работу сервисов
 
 
-<h3 align="center">1. Настройка инфраструктуры сервера</h3>
-
-<b>1.1 Закинем публичный ключ на сервер </b>
-
-<code>ssh-copy-id -i ~/.ssh/id_rsa.pub root@server_ip </code>
-
-<b>1.2 Создаем пользователя и даём права sudo</b>
+<h3 align="center">1. Создаем пользователя и даём права sudo</h3>
 
 <code>adduser admin</code>
 
 <code>usermod -aG sudo admin</code>
 
 <code>su -- admin</code>
-
-<code>cd ~/</code>
 
 
 <h3 align="center">2. Настройка сервера для разработки (Miniconda, Poetry, Docker, ect)</h3>
@@ -86,19 +78,20 @@
 <b>2.10 Создадим и виртуальное окружение без библиотек  </b>
 
 <code>conda create --no-default-packages -n train_env python=3.11</code>
+
 <code>conda activate train_env</code>
 
 <b>2.11 Установим Docker  </b>
 
-<code>
-sudo apt-get update
+<code>for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove $pkg; done</code>
+
+<code>sudo apt-get update
 sudo apt-get install ca-certificates curl
 sudo install -m 0755 -d /etc/apt/keyrings
 sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-sudo chmod a+r /etc/apt/keyrings/docker.asc</code>
+sudo chmod a+r /etc/apt/keyrings/docker.asc
 
-
-<code>echo \
+echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
   $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
@@ -106,10 +99,12 @@ sudo apt-get update</code>
 
 <code>sudo apt-get update</code>
 
-<code>sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-compose </code>
+<code>sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin</code>
 
 <code>sudo groupadd docker</code>
+
 <code>sudo usermod -aG docker $USER</code>
+
 <code>newgrp docker</code>
 
 <b>2.12 Настроим DNS-серверы для всех контейнеров, добавить в файл </b>
