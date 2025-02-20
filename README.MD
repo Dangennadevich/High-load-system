@@ -28,11 +28,9 @@
 
 <code>sudo apt update && sudo apt install git && sudo apt install postgresql-client -y && sudo apt install net-tools</code>
 
-<b>2.2 Копируем репозиторий с проектом в папку ~/project/</b>
+<b>2.2 Копируем репозиторий с проектом</b>
 
-<code>mkdir project && cd project </code>
-
-<code>git clone -b checkpoint_2 https://github.com/Dangennadevich/HSE_Homeworks.git </code>
+<code>git clone -b checkpoint_3 https://github.com/Dangennadevich/HSE_Homeworks.git </code>
 
 <code>mv HSE_Homeworks/* .</code>
 
@@ -97,8 +95,6 @@ echo \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt-get update</code>
 
-<code>sudo apt-get update</code>
-
 <code>sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin</code>
 
 <code>sudo groupadd docker</code>
@@ -130,9 +126,9 @@ sudo apt-get update</code>
 
 <code>conda activate train_env </code> 
 
-<b>3.2 Команды ниже выполняем из директории project </b>
+<b>3.2 Команды ниже выполняем из директории cpu_server или gpu_server </b>
 
-<code>cd ~/project/ </code> 
+<code>cd *pu_server/ </code> 
 
 <b>3.3 Выполнем инициализацию poetry, устанавливаем библиотеки</b>
 
@@ -140,7 +136,7 @@ sudo apt-get update</code>
 
 <b>3.4 Создаем файл .env с кредами </b>
 
-<code>nano ~/project/.env</code>
+<code>nano ~/*pu_server/.env</code>
 
 <code>AWS_SECRET_ACCESS_KEY = 
 AWS_ACCESS_KEY_ID = 
