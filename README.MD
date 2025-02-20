@@ -95,7 +95,7 @@ echo \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt-get update</code>
 
-<code>sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin</code>
+<code>sudo apt-get install docker-ce docker-compose docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin</code>
 
 <code>sudo groupadd docker</code>
 
@@ -146,15 +146,11 @@ POSTGRES_PASSWORD =
 
 <h3 align="center">4. Поднимаем docker-compose </h3>
 
-<b>4.1 Команды ниже выполняем из директории project </b>
-
-<code>cd ~/project/ </code> 
-
-<b>4.2 Создаем docker образ </b>
+<b>4.1 Создаем docker образ </b>
 
 <code>docker-compose build </code> 
 
-<b>4.3 Запускаем сервисы  </b>
+<b>4.2 Запускаем сервисы  </b>
 
 <code>docker-compose up </code> 
 
@@ -173,7 +169,9 @@ POSTGRES_PASSWORD =
 
 Ожидается ответ в виде числа, которое может быть оценкой вероятности того, что текст был сгенерирован моделью
 
-<code>curl -X POST "http://62.113.44.18:8000/predict" -H "Content-Type: application/json" -d '{"text": "Привет как дела?"}' </code> 
+<code>curl -X POST "http://92.255.111.116:8000/predict" -H "Content-Type: application/json" -d '{"text": "Привет как дела?"}' </code> 
+
+Ответ: {"text":"Привет как дела?","result":"Processed text: Привет как дела?, probability generated text = 0.013"}% 
 
 <b>5.4 # MlFlow крутится на 5050 порту</b>
 
