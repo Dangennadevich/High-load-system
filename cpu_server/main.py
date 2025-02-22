@@ -1,10 +1,10 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from dotenv import load_dotenv
+from databases import Database
 
 import os
 import aio_pika
-import asyncio
 import json
 import uuid
 import logging
@@ -12,14 +12,24 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+logger.info("[Setup] Getting .env settings")
+
 load_dotenv()
 
 RABBITMQ_DEFAULT_USER = os.getenv("RABBITMQ_DEFAULT_USER")
 RABBITMQ_DEFAULT_PASS = os.getenv("RABBITMQ_DEFAULT_PASS")
-
 if not RABBITMQ_DEFAULT_USER or not RABBITMQ_DEFAULT_PASS:
     raise ValueError("RABBITMQ_DEFAULT_USER and RABBITMQ_DEFAULT_PASS must be set in the .env file")
 
+POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
+POSTGRES_USER = os.getenv("POSTGRES_USER")
+if not POSTGRES_PASSWORD or not POSTGRES_USER:
+    raise ValueError("POSTGRES_PASSWORD and POSTGRES_USER must be set in the .env file")
+
+# Connect to PostgreSQL
+logger.info("[Setup] Connect to PostgreSQL")
+DATABASE_URL = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@postgres_db/rabbitmq_db"
+database = Database(DATABASE_URL)
 
 app = FastAPI()
 
@@ -27,33 +37,19 @@ class TextInput(BaseModel):
     '''Model for input data'''
     text: str
 
+@app.on_event("startup")
+async def startup():
+    await database.connect()
+
+@app.on_event("shutdown")
+async def shutdown():
+    await database.disconnect()
+
 async def connect_to_rabbitmq():
     '''Get connect to RabbitMQ from rabbitmq container'''
     return await aio_pika.connect_robust(
         f"amqp://{RABBITMQ_DEFAULT_USER}:{RABBITMQ_DEFAULT_PASS}@rabbitmq/"
     )
-
-async def get_response(callback_queue, correlation_id):
-    '''Listen request GPU-server from queue RabbitMQ'''
-    try:
-        message = await asyncio.wait_for(
-            callback_queue.get(), 
-            timeout=60.0
-        )
-        async with message.process():
-            logger.info(f"Received message: {message.body.decode()}")
-            if message.correlation_id == correlation_id:
-                return message.body.decode()
-            else:
-                logger.error(f"Mismatched ID: Expected {correlation_id}, Got {message.correlation_id}")
-                return "Invalid correlation ID"
-    except asyncio.TimeoutError:
-        logger.error("Timeout waiting for response")
-        return "Timeout"
-    except Exception as e:
-        logger.error(f"Error: {str(e)}")
-        return f"Error: {str(e)}"
-
 
 @app.get("/")
 def read_root():
@@ -64,42 +60,39 @@ def read_root():
 async def predict(text_input: TextInput):
     '''Post request processing'''
     try:
+        # Generate task id
+        task_id = str(uuid.uuid4())
+
+        logger.info(f"Received a message: -task_id: {task_id} -message: {text_input.text}")
+
+        # Save task to DB with status "pending"
+        query = "INSERT INTO tasks_detecting_generated_text (task_id, status) VALUES (:task_id, :status)"
+        await database.execute(query, values={"task_id": task_id, "status": "pending"})
+
         connection = await connect_to_rabbitmq()
         channel = await connection.channel()
-        correlation_id = str(uuid.uuid4())
-        message = {"text": text_input.text}
-
-        # We are announcing the exchanger
         exchange = await channel.declare_exchange(
             "direct_exchange", 
             aio_pika.ExchangeType.DIRECT, 
             durable=True
         )
 
-        # Declaring and linking a queue for results
-        result_queue = await channel.declare_queue("results_pred_gen_txt", durable=True)
-        await result_queue.bind(exchange="direct_exchange", routing_key="results_pred_gen_txt")
+        # Message for rabbitmq and GPU server
+        message = {"task_id": task_id, "text": text_input.text}
 
         # publish message
         await exchange.publish(
             aio_pika.Message(
                 body=json.dumps(message).encode(),
-                correlation_id=correlation_id,
-                reply_to="results_pred_gen_txt" # where should the gpu service's response be sent
+                correlation_id=task_id
             ),
             routing_key="tasks_pred_gen_txt",
         )
 
-        logger.info(f"Send message with correlation_id: {correlation_id}")
+        logger.info(f"Sent message with task_id: {task_id}")
 
-        await asyncio.sleep(1)
-        
-        # Get a response
-        response = await get_response(result_queue, correlation_id)
-        logger.info(f"Post from server GPU! Sent result: {response}")
-
-        return {"text": text_input.text, "result": response}
-
+        return {"task_id": task_id}
+    
     except Exception as e:
         logger.error(f"Error in predict: {e}")
         return {"error": str(e)}
@@ -107,6 +100,21 @@ async def predict(text_input: TextInput):
         if connection:
             await connection.close()
 
+@app.get("/status/{task_id}")
+async def get_status(task_id: str):
+    '''Get status of the task'''
+    logger.info(f"Get info about task_id: {task_id}")
+
+    query = "SELECT status, result FROM tasks_detecting_generated_text WHERE task_id = :task_id"
+    task = await database.fetch_one(query, values={"task_id": task_id})
+
+    if task is None:
+        logger.info(f"Task not found, task_id: {task_id}")
+        return {"error": "Task not found"}
+    
+    logger.info(f"task_id: {task_id}, status: {task['status']}, result: {task['result']}")
+
+    return {"task_id": task_id, "status": task["status"], "result": task["result"]}
 
 if __name__ == "__main__":
     import uvicorn

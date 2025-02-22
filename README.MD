@@ -40,9 +40,9 @@
 
 <b>2.2 Копируем репозиторий с проектом</b>
 
-<code>git clone -b checkpoint_3 https://github.com/Dangennadevich/HSE_Homeworks.git </code>
+<code>git clone -b checkpoint_3 https://github.com/Dangennadevich/High-load-system.git </code>
 
-<code>mv HSE_Homeworks/* .</code>
+<code>mv High-load-system/* .</code>
 
 <b>2.3 Скачиваем Miniconda в корень (~/), Запускаем установку</b>
 
@@ -71,7 +71,7 @@
 
 <b>2.8 Установим poetry для управления зависимостями и проверим установку  </b>
 
-<code>pip install poetry</code>
+<code>sudo apt update  && sudo apt install python3-poetry</code>
 
 <code>poetry config virtualenvs.create false</code>
 

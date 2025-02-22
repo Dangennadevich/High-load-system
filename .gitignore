@@ -4,3 +4,4 @@ subject_machine_learning/.DS_Store
 .env
 cpu_server/.env
 gpu_server/.env
+cpu_server/nginx-logs/
