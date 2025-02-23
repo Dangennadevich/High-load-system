@@ -33,17 +33,19 @@
 
 <b>4.3 Создаем обменник в UI версии, у меня поднимается с типом direct  </b>
 
+<code>http://CPU_IP:15672/#/exchanges</code> 
+
 <code>direct_exchange </code> 
 
 
-<h3 align="center">2. Проверяем работу сервисов </h3>
+<h3 align="center">2. Проверяем работу сервисов (после поднятия сервисов на GPU) </h3>
 
 
 <h5 align="left">2.1 Сервис оценки текста - написан ли он при помощи AI </h5>
 
 <b>2.1.1 Пример запроса сгенерирован ли текст "Привет как дела?" моделью. Отправляется по адресу IP_CPU_SERVER:8000/predict :</b>
 
-<code>curl -X POST "http://178.253.40.134:8000/predict" -H "Content-Type: application/json" -d '{"text": "Привет как дела?"}'</code> 
+<code>curl -X POST "http://IP_CPU_SERVER:8000/predict" -H "Content-Type: application/json" -d '{"text": "Привет как дела?"}'</code> 
 
 <b>2.1.2 Ожидаем ответ от сервиса - сгенерированный task id, пример ответа:</b>
 
@@ -51,7 +53,7 @@
 
 <b>2.1.3 Отправляем запрос с task id для получении ответа от сервера: </b>
 
-<code>curl -X GET "http://178.253.40.134:8000/status/bdf1fdec-8985-415e-be24-e709216f9257"</code> 
+<code>curl -X GET "http://IP_CPU_SERVER:8000/status/bdf1fdec-8985-415e-be24-e709216f9257"</code> 
 
 <b>2.1.4 Пример ответа о запросе:</b>
 
@@ -62,7 +64,7 @@
 
 <b>2.2.1 UI сервиса</b>
 
-<code>http://178.253.40.134:15672/#/exchanges </code> 
+<code>http://IP_CPU_SERVER:15672/#/exchanges </code> 
 
 <b>2.2.2 Проверяем логирование пользовательских запросов в БД </b>
 
@@ -82,7 +84,7 @@
 
 <b>2.2.1 MlFlow крутится на 5050 порту</b>
 
-<code>http://92.255.111.116:5050</code> 
+<code>http://IP_CPU_SERVER:5050</code> 
 
 <b>2.2.2 Проверим переменные окружения в контейнере MlFlow и подключение к postgres</b>
 
@@ -101,20 +103,7 @@ env | grep MLFLOW </code>
 <code>docker logs container_name --tail 50</code> 
 
 
-<h3 align="center">3. Запрос к сервису </h3>
-
-Выполняется после настройки GPU сервиса (~/gpu_server/README.MD пункты 1-2)
-
-<b>Отправляем запрос на сервис. Ожидается ответ.</b>
-
-Ожидается ответ в виде числа, которое может быть оценкой вероятности того, что текст был сгенерирован моделью
-
-<code>curl -X POST "http://92.255.111.116:8000/predict" -H "Content-Type: application/json" -d '{"text": "Привет как дела?"}' </code> 
-
-Ответ: {"text":"Привет как дела?","result":"Processed text: Привет как дела?, **probability generated text = 0.013**"}% 
-
-
-<h1 align="center">Файлы из директории CPU сервера</h1>
+<h1 align="center"> 3. Файлы из директории CPU сервера</h1>
 
 **main.py** - скрипт для запуска сервиса на CPU сервере. 
 
