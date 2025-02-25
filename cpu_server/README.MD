@@ -95,8 +95,14 @@ env | grep MLFLOW </code>
 
 <code>psql -h postgres_db -U postgres -d mlflow_db -p 5432</code> 
 
+<h5 align="left">2.5 Проверяем работут Статики </h5>
 
-<h5 align="left">2.5 Общие проверки </h5>
+Статика открывается по адресу (заменить на IP CPU сервера):
+
+<code>http://178.253.40.134/static/nginx.jpg</code> 
+
+
+<h5 align="left">2.6 Общие проверки </h5>
 
 <b>2.6 Проверить логи контейнеров</b>
 
