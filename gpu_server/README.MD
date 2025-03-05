@@ -23,13 +23,33 @@
 
 <h3 align="center">2. Поднимаем сервисы </h3>
 
-<b>2.1 Создаем docker образ (Только из Dockerfile)</b>
+<b>2.1 Создаем секреты </b>
 
-<code>docker build -t gpu .</code> 
+<code>kubectl create secret generic app-secrets \
+  --from-env-file=.env \
+  -n default</code>
 
-<b>2.2 Запускаем сервис  </b>
+<h5 align="left">2.2 fastapi-service</h5>
 
-<code>docker run gpu </code> 
+<b>2.2.1 Создаем контейнер на основе Dockerfile </b>
+
+<code>eval $(minikube docker-env)</code>
+
+<code>docker build -t ai-model-app:latest .</code>
+
+<b>2.2.2 Применяем манифесты </b>
+
+<code>kubectl apply -f k8s/model-fastapi-deployment.yaml</code>
+
+<code>kubectl apply -f k8s/model-fastapi-service.yaml</code>
+
+<b>2.2.3 Проверка pods </b>
+
+<code>kubectl get pods -l app=model-fastapi-app</code>
+
+<b>2.2.4 Проверка сервиса </b>
+
+<code>curl -v http://localhost:8000</code>
 
 
 <h1 align="center">Файлы из директории GPU сервера</h1>
@@ -40,3 +60,5 @@
 **Dockerfile** Инструкция для развертывания сервиса с "моделью"
 
 **pyproject.toml** Poetry инструкция для настройки виртуального окружения
+
+**/k8s** Директория с конфигами/манифестами для сервисов k8s

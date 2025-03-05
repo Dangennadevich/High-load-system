@@ -28,7 +28,7 @@ if not POSTGRES_PASSWORD or not POSTGRES_USER:
 
 # Connect to PostgreSQL
 logger.info("[Setup] Connect to PostgreSQL")
-DATABASE_URL = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@postgres_db/rabbitmq_db"
+DATABASE_URL = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@postgres:5432/rabbitmq_db"
 database = Database(DATABASE_URL)
 
 app = FastAPI()

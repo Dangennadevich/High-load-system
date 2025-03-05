@@ -22,7 +22,7 @@
 * 4) Поднимаем сервисы (ссылка на инструкции)
 * 5) Запрос к сервису
 
-<h3 align="center">1. Создаем пользователя и даём права sudo</h3>
+<h3 align="center">1. Создаем пользователя и даём права sudo  [CPU & GPU]</h3>
 
 <h5 align="left">Для CPU & GPU сервера</h5>
 
@@ -33,9 +33,7 @@
 <code>su -- admin</code>
 
 
-<h3 align="center">2. Настройка сервера для разработки (Miniconda, Poetry, Docker, ect)</h3>
-
-<h5 align="left">Для CPU & GPU сервера</h5>
+<h3 align="center">2. Настройка сервера для разработки (Miniconda, Poetry, Docker, ect) [CPU & GPU]</h3>
 
 <b>2.1 Устанавливаем Git, net-tools, PSQL</b>
 
@@ -108,8 +106,21 @@
 
 <code> docker run hello-world </code>
 
+<b>2.13 [train_env]  Установи Minikube  </b>
 
-<h3 align="center">3. Общая настройка окружения для работы сервера </h3>
+<code> curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 </code>
+
+<code> sudo install minikube-linux-amd64 /usr/local/bin/minikube </code>
+
+<code> minikube start --driver=docker </code>
+
+<b>2.14 [train_env]  Установи Minikube  </b>
+
+<code> curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" </code>
+
+<code> sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl </code>
+
+<h3 align="center">3. Общая настройка окружения для работы сервера  [CPU & GPU]</h3>
 
 <h5 align="left">Для CPU & GPU сервера</h5>
 
@@ -134,14 +145,14 @@ CPU_SERVER_IP=
 </code> 
 
 
-<h3 align="center">4. Поднимаем сервисы </h3>
+<h3 align="center">4. Поднимаем сервисы  [CPU | GPU]</h3>
 
 <b>4.1 Инструкция для CPU сервера находится в ~/cpu_server/README.MD </b>
 
 <b>4.2 Инструкция для GPU сервера находится в ~/gpu_server/README.MD </b>
 
 
-<h3 align="center">5. Запрос к сервису (IP CPU сервера) </h3>
+<h3 align="center">5. Запрос к сервису (IP CPU сервера) [CPU]</h3>
 
 <b>Отправляем запрос на сервис. Ожидается ответ.</b>
 
