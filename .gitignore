@@ -1,4 +1,5 @@
 .DS_Store
+.gitignore
 /subject_machine_learning/hw_1/.DS_Store
 subject_machine_learning/.DS_Store
 .env
@@ -11,3 +12,4 @@ cpu_server/k8s/static-server-deployment.yaml
 cpu_server/k8s/static-server-service.yaml
 cpu_server/k8s/nginx_static
 cpu_server/k8s/config/static-server
+gpu_server/main_no_psql.py
