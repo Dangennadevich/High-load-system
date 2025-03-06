@@ -19,7 +19,7 @@
 
 <h2 align="center">Настройка сервисов на GPU</h2>
 
-Выполняется после развертывания необходимого ПО на сервере (~/README.MD, пункт 1-3) и поднятии инфраструктуры на CPU сервере (~/cpu_server/README.MD)
+Выполняется после развертывания необходимого ПО на сервере (README.MD, пункт 1-3) и поднятии инфраструктуры на CPU сервере (cpu_server/README.MD)
 
 <h3 align="center">2. Поднимаем сервисы </h3>
 
@@ -29,7 +29,7 @@
   --from-env-file=.env \
   -n default</code>
 
-<h5 align="left">2.2 fastapi-service</h5>
+<h3 align="left">2.2 fastapi-service</h3>
 
 <b>2.2.1 Создаем контейнер на основе Dockerfile </b>
 

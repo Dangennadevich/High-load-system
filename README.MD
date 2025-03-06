@@ -22,6 +22,8 @@
 * 4) Поднимаем сервисы (ссылка на инструкции)
 * 5) Запрос к сервису
 
+
+
 <h3 align="center">1. Создаем пользователя и даём права sudo  [CPU & GPU]</h3>
 
 <h5 align="left">Для CPU & GPU сервера</h5>
@@ -31,6 +33,7 @@
 <code>usermod -aG sudo admin</code>
 
 <code>su -- admin</code>
+
 
 
 <h3 align="center">2. Настройка сервера для разработки (Miniconda, Poetry, Docker, ect) [CPU & GPU]</h3>
@@ -120,6 +123,8 @@
 
 <code> sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl </code>
 
+
+
 <h3 align="center">3. Общая настройка окружения для работы сервера  [CPU & GPU]</h3>
 
 <h5 align="left">Для CPU & GPU сервера</h5>
@@ -145,11 +150,13 @@ CPU_SERVER_IP=
 </code> 
 
 
+
 <h3 align="center">4. Поднимаем сервисы  [CPU | GPU]</h3>
 
 <b>4.1 Инструкция для CPU сервера находится в ~/cpu_server/README.MD </b>
 
 <b>4.2 Инструкция для GPU сервера находится в ~/gpu_server/README.MD </b>
+
 
 
 <h3 align="center">5. Запрос к сервису (IP CPU сервера) [CPU]</h3>
@@ -174,6 +181,10 @@ CPU_SERVER_IP=
 
 ![Alt text](example_post_request_to_server.png)
 
+
+
 <h3 align="center">6. Тест нагрузки</h3>
+
+В примере сервис поднят при помощи minicube на одном узле cpu.
 
 ![Alt text](Service-test.png)
