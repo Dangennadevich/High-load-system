@@ -41,7 +41,7 @@
 
 <b>2.2 Копируем репозиторий с проектом</b>
 
-<code>git clone -b checkpoint_3 https://github.com/Dangennadevich/High-load-system.git </code>
+<code>git clone -b checkpoint_5 https://github.com/Dangennadevich/High-load-system.git </code>
 
 <code>mv High-load-system/* .</code>
 
@@ -173,3 +173,7 @@ CPU_SERVER_IP=
   }
 
 ![Alt text](example_post_request_to_server.png)
+
+<h3 align="center">6. Тест нагрузки</h3>
+
+![Alt text](Service-test.png)

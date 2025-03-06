@@ -49,7 +49,8 @@
 <code>kubectl exec -it deployment/postgres -- psql -U postgres -d mlflow_db -c "\l"</code>
 
 <b>1.2.4 Прокидываем порты (GPU сервер должен иметь доступ к БД) </b>
-kubectl port-forward --address 0.0.0.0 service/postgres 5432:5432 > /dev/null 2>&1 &
+
+<code>kubectl port-forward --address 0.0.0.0 service/postgres 5432:5432 > /dev/null 2>&1 &</code>
 
 <h5 align="left">1.3 RabbitMQ </h5>
 
@@ -66,6 +67,7 @@ kubectl port-forward --address 0.0.0.0 service/postgres 5432:5432 > /dev/null 2>
 <b>1.3.3 Прокидываем порты (Брокер нужен для общение с внешним GPU сервером) </b>
 
 <code>kubectl port-forward --address 0.0.0.0 service/rabbitmq 15672:15672 > /dev/null 2>&1 &</code>
+
 <code>kubectl port-forward --address 0.0.0.0 service/rabbitmq 5672:5672 > /dev/null 2>&1 &</code>
 
 <b>1.3.4 Проверяем UI и создаем очередь direct с именем direct_exchange</b>
@@ -120,6 +122,13 @@ kubectl port-forward --address 0.0.0.0 service/postgres 5432:5432 > /dev/null 2>
 <b>2.1.4 Пример ответа о запросе:</b>
 
 <code>{"task_id":"bdf1fdec-8985-415e-be24-e709216f9257","status":"completed","result":"Processed text: Привет как дела?, probability generated text = 0.527"}</code> 
+
+<b>2.1.5 Если работает только на localhost.. Возможно закрыт порт - откроем его</b>
+
+<code>sudo ufw allow 8000/tcp</code> 
+
+<code>sudo ufw reload</code> 
+
 
 <h1 align="center"> 3. Файлы из директории CPU сервера</h1>
 
