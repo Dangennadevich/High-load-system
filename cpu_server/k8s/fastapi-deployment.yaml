@@ -17,6 +17,8 @@ spec:
         image: fastapi-app:latest
         imagePullPolicy: Never
         env:
+        - name: APP_MODE
+          value: "web"
         - name: WORKERS
           value: "8"
         - name: PORT
@@ -33,5 +35,15 @@ spec:
             secretKeyRef:
               name: app-secrets
               key: POSTGRES_PASSWORD
+        - name: RABBITMQ_DEFAULT_USER
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: RABBITMQ_DEFAULT_USER
+        - name: RABBITMQ_DEFAULT_PASS
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: RABBITMQ_DEFAULT_PASS
         ports:
         - containerPort: 8000

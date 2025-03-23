@@ -13,8 +13,5 @@ data:
     );
 kind: ConfigMap
 metadata:
-  creationTimestamp: "2025-03-02T17:02:49Z"
   name: postgres-init-script
   namespace: default
-  resourceVersion: "6999"
-  uid: 4931f106-3809-4552-8abc-14c2cb1a60d0

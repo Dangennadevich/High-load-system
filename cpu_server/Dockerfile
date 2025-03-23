@@ -15,6 +15,11 @@ COPY . /app
 ENV WORKERS=8
 ENV PORT=8000
 ENV DEBUG=False
+# Режим запуска: "web" (FastAPI), "celery_worker" или "flower"
+ENV APP_MODE=web
 
-# Команды для запуска сервиса
-CMD ["sh", "-c", "poetry run gunicorn -w $WORKERS -k uvicorn.workers.UvicornWorker main:app --bind 0.0.0.0:$PORT"]
+# Копируем скрипт запуска и делаем его исполняемым
+COPY /app/entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
+CMD ["/app/entrypoint.sh"]

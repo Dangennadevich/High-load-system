@@ -13,3 +13,5 @@ cpu_server/k8s/static-server-service.yaml
 cpu_server/k8s/nginx_static
 cpu_server/k8s/config/static-server
 gpu_server/main_no_psql.py
+homework.md
+cpu_server/__pycache__/

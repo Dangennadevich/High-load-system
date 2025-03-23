@@ -1,20 +1,21 @@
 import numpy as np
-import aio_pika
-import asyncio
-import logging
 import json
+import logging
+import pika
+import psycopg2
+from celery import Celery
 import os
-
-from databases import Database
 from dotenv import load_dotenv
+from databases import Database
 
+# Настройка логирования
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-logger.info("[Setup] Getting .env settings")
-
+# Загрузка переменных окружения
 load_dotenv()
 
+# Конфигурация
 RABBITMQ_DEFAULT_USER = os.getenv("RABBITMQ_DEFAULT_USER")
 RABBITMQ_DEFAULT_PASS = os.getenv("RABBITMQ_DEFAULT_PASS")
 
@@ -30,73 +31,55 @@ CPU_SERVER_IP = os.getenv("CPU_SERVER_IP")
 if not CPU_SERVER_IP:
     raise ValueError("CPU_SERVER_IP must be set in the .env file")
 
-# Connect to PostgreSQL
-logger.info("[Setup] Connect to PostgreSQL")
 DATABASE_URL = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{CPU_SERVER_IP}:5432/rabbitmq_db"
-database = Database(DATABASE_URL)
+database = Database(DATABASE_URL, min_size=2, max_size=10)
 
-async def startup():
-    await database.connect()
+# Инициализация Celery
+celery_app = Celery(
+    'gpu_tasks',
+    broker=f'amqp://{RABBITMQ_DEFAULT_USER}:{RABBITMQ_DEFAULT_PASS}@{CPU_SERVER_IP}:5672//',
+    backend='rpc://',
+    task_default_queue='tasks_pred_gen_txt'
+)
 
-async def shutdown():
-    await database.disconnect()
+# Конфигурация Celery
+celery_app.conf.update(
+    task_serializer='json',
+    accept_content=['json'],
+    result_serializer='json',
+    timezone='UTC',
+    enable_utc=True,
+)
 
-async def connect_to_rabbitmq():
-    '''We will establish a connection to RabbitMQ on the CPU server'''
-    return await aio_pika.connect_robust(
-        f"amqp://{RABBITMQ_DEFAULT_USER}:{RABBITMQ_DEFAULT_PASS}@{CPU_SERVER_IP}/"
-    )
-
-async def process_message(message: aio_pika.abc.AbstractMessage):
-    '''Message processing'''
-    async with message.process():
-        data = json.loads(message.body.decode())
-        task_id = data["task_id"]
-        text = data["text"]
-
-        logger.info(f"Processing task {task_id}: {text}")
-
-        # Generate a random probability, there will be an AI model in the future.
-        prob = round(np.random.rand(), 3)
-        result = f"Processed text: {data['text']}, probability generated text = {prob}"
-        
-        logger.info(f"Task {task_id} processed, result: {result}")
-
-        # Update task status
-        query = "UPDATE tasks_detecting_generated_text SET status = 'completed', result = :result WHERE task_id = :task_id"
-        await database.execute(query, values={"task_id": task_id, "result": result})
-
-
-async def consume():
-    '''Listening to the queue'''
-    async with await connect_to_rabbitmq() as connection:
-        async with connection.channel() as channel:
-
-            exchange = await channel.declare_exchange(
-                "direct_exchange", aio_pika.ExchangeType.DIRECT, durable=True
-            )
-
-            # Declaring and linking a queue
-            queue = await channel.declare_queue("tasks_pred_gen_txt", durable=True)
-            await queue.bind(exchange=exchange, routing_key="tasks_pred_gen_txt")
-
-            # Starting message processing
-            await queue.consume(process_message)
-            while True:
-                await asyncio.sleep(1) # Leaves the service in an endless loop
-
-def main():
-    '''Запуск сервиса'''
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(startup())  # Connect to db
+@celery_app.task(name='process_task', bind=True)
+def process_task(self, task_id, text):
     try:
-        loop.run_until_complete(consume())
-    except KeyboardInterrupt:
-        print("Остановка сервиса...")
-    finally:
-        # Closing all asynchronous resources
-        loop.run_until_complete(asyncio.sleep(0))
-        loop.close()
+        logger.info(f"Processing task {task_id}: {text}")
+        
+        # Генерация вероятности
+        prob = round(np.random.rand(), 3)
+        result = f"Processed text: {text}, probability = {prob}"
 
-if __name__ == "__main__":
-    main()
+        logger.info(f"Result: {result}")
+        
+        # Синхронное подключение к БД
+        conn = psycopg2.connect(DATABASE_URL)
+        with conn.cursor() as cursor:
+            cursor.execute(
+                "UPDATE tasks_detecting_generated_text SET status = 'completed', result = %s WHERE task_id = %s",
+                (result, task_id)
+            )
+            conn.commit()
+        
+        logger.info(f"Task {task_id} processed successfully")
+        return result
+    
+    except Exception as e:
+        logger.error(f"Error processing task {task_id}: {str(e)}")
+        self.retry(exc=e, countdown=60)
+
+# Запуск Celery Worker
+if __name__ == '__main__':
+    celery_app.worker_main(
+        argv=['worker', '--loglevel=info', '-Q', 'tasks_pred_gen_txt']
+    )
