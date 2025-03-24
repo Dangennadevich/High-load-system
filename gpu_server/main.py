@@ -8,11 +8,9 @@ import os
 from dotenv import load_dotenv
 from databases import Database
 
-# Настройка логирования
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Загрузка переменных окружения
 load_dotenv()
 
 # Конфигурация
@@ -34,7 +32,6 @@ if not CPU_SERVER_IP:
 DATABASE_URL = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{CPU_SERVER_IP}:5432/rabbitmq_db"
 database = Database(DATABASE_URL, min_size=2, max_size=10)
 
-# Инициализация Celery
 celery_app = Celery(
     'gpu_tasks',
     broker=f'amqp://{RABBITMQ_DEFAULT_USER}:{RABBITMQ_DEFAULT_PASS}@{CPU_SERVER_IP}:5672//',
@@ -42,7 +39,6 @@ celery_app = Celery(
     task_default_queue='tasks_pred_gen_txt'
 )
 
-# Конфигурация Celery
 celery_app.conf.update(
     task_serializer='json',
     accept_content=['json'],
@@ -56,13 +52,11 @@ def process_task(self, task_id, text):
     try:
         logger.info(f"Processing task {task_id}: {text}")
         
-        # Генерация вероятности
         prob = round(np.random.rand(), 3)
         result = f"Processed text: {text}, probability = {prob}"
 
         logger.info(f"Result: {result}")
         
-        # Синхронное подключение к БД
         conn = psycopg2.connect(DATABASE_URL)
         with conn.cursor() as cursor:
             cursor.execute(
@@ -78,7 +72,6 @@ def process_task(self, task_id, text):
         logger.error(f"Error processing task {task_id}: {str(e)}")
         self.retry(exc=e, countdown=60)
 
-# Запуск Celery Worker
 if __name__ == '__main__':
     celery_app.worker_main(
         argv=['worker', '--loglevel=info', '-Q', 'tasks_pred_gen_txt']

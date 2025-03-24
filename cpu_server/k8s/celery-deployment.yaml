@@ -16,8 +16,7 @@ spec:
       - name: celery-worker
         image: fastapi-app:latest
         imagePullPolicy: Never
-        command: ["celery", "-A", "main.celery_app", "worker", "--without-gossip", "--loglevel=info"]
-
+        command: ["celery", "-A", "celery_app", "worker", "--without-gossip", "--loglevel=info"]
         env:
         - name: APP_MODE
           value: "celery_worker"
@@ -31,3 +30,4 @@ spec:
             secretKeyRef:
               name: app-secrets
               key: RABBITMQ_DEFAULT_PASS
+        

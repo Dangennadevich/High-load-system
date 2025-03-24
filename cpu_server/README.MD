@@ -10,31 +10,27 @@
 
 <h1 align="center">СPU часть проекта</h1>
 
-При помощи Minikube поднимаем FastAPI сервис на первом сервере архитектуры. так же в текущей версии проекта через Minicube поднимаеся вся необходимая архитектура для работы сервиса: PostgreSQL, RabbitMQ. На втором сервере поднимаем сервис, где будет модель.
+При помощи Minikube поднимаем FastAPI сервис на первом сервере архитектуры. Так же в текущей версии проекта через Minicube поднимаеся вся необходимая архитектура для работы сервиса: PostgreSQL, RabbitMQ, Celery, Flower. На втором сервере поднимаем сервис, где будет работать модель.
 
 **/predict** Ручка получает сообщение от пользователя. После получения обрабатывает его - отправляет запрос на GPU через брокера сообщений rabbitmq. Так же сервис записывает уникальный номер запроса в БД и устанавливает статус "Pending".
 
+CPU_FASTAPI_SERV >> [Celery (RabbitMQ), PSQL DB]
+
 **/status/{task_id}** По task_id из /predict вытаскиваем статус запроса из БД, результат работы AI модели с GPU сервера.
 
-Связи сервиса GPU с другими объектами архитектуры: 
+CPU_FASTAPI_SERV >> PSQL DB >> CPU_FASTAPI_SERV
 
-**CPU >> [RabbitMQ, PSQL DB]**
-
-**CPU >> PSQL DB >> CPU**
 
 <h1 align="center">Настройка сервисов на СPU</h1>
 
 Выполняется после развертывания необходимого ПО на сервере (~/README.MD, пункт 1-3)
 
 
-
 <h3 align="center">1. Поднимаем сервисы в директории cpu_server </h3>
 
 <b>1.1 Создаем секреты </b>
 
-<code>kubectl create secret generic app-secrets \
-  --from-env-file=.env \
-  -n default</code>
+<code>kubectl create secret generic app-secrets --from-env-file=.env -n default</code>
 
 <h3 align="left">1.2 Postgres </h3>
 
@@ -52,13 +48,13 @@
 
 <code>kubectl get pods -l app=postgres</code>
 
-<b>1.2.3 Проверка поднятых БД</b>
-
-<code>kubectl exec -it deployment/postgres -- psql -U postgres -d mlflow_db -c "\l"</code>
-
-<b>1.2.4 Прокидываем порты (GPU сервер должен иметь доступ к БД для обновления логов (вносит результат)) </b>
+<b>1.2.3 Прокидываем порты (GPU сервер должен иметь доступ к БД для обновления логов (вносит результат)) </b>
 
 <code>kubectl port-forward --address 0.0.0.0 service/postgres 5432:5432 > /dev/null 2>&1 &</code>
+
+<b>1.2.4 Проверка поднятых БД</b>
+
+<code>kubectl exec -it deployment/postgres -- psql -U postgres -d mlflow_db -c "\l"</code>
 
 <h3 align="left">1.3 RabbitMQ </h3>
 
@@ -109,6 +105,27 @@
 <code>curl -v http://localhost:8000</code>
 
 <code>curl -X POST "http://localhost:8000/predict" -H "Content-Type: application/json" -d '{"text": "Привет, как дела?"}'</code>
+
+<h3 align="left">1.5 Flower </h3>
+
+<b>1.5.1 Применяем манифесты </b>
+
+<code>kubectl apply -f k8s/flower-deployment.yaml</code>
+
+<code>kubectl apply -f k8s/flower-service.yaml</code>
+
+<b>1.5.2 Проверка pods </b>
+
+<code>kubectl get pods -l app=flower</code>
+
+<b>1.5.3 Прокидываем порты (Брокер нужен для общение с внешним GPU сервером) </b>
+
+<code>kubectl port-forward --address 0.0.0.0 service/flower 5555:5555 > /dev/null 2>&1 &</code>
+
+<b>1.5.4 Проверяем UI и создаем очередь direct с именем direct_exchange</b>
+
+<code>http://<IP_CPU_SERVER>:5555</code>
+
 
 <h3 align="center">2. Проверяем работу сервисов (после поднятия сервисов на GPU) </h3>
 
