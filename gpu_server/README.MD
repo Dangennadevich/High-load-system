@@ -52,6 +52,40 @@ RabbitMQ (Celery) >> GPU >> PSQL
 
 <code>curl -v http://localhost:8000</code>
 
+<h3 align="left">2.3 Работа с CronJob</h3>
+
+<b>3.1 Проверка сервиса </b>
+
+<code>cd fit_model</code>
+
+<b>3.2 Создаем контейнер </b>
+
+<code>eval $(minikube docker-env)</code>
+
+<code>docker build -t model-trainer:latest .</code>
+
+<b>3.3 Поднимаем манифесты </b>
+
+<code>kubectl apply -f model-storage.yaml </code>
+
+<code>kubectl get pv</code>
+
+Ожидаем Status = BOUND в pv
+
+<code>kubectl get pvc</code>
+
+<code>kubectl apply -f model-training-cronjob.yaml </code>
+
+<b>3.4 Внеочередной тестовый запуск задачи</b>
+
+<code>kubectl delete job test-job 2>/dev/null</code>
+
+<code>kubectl create job --from=cronjob/model-trainer test-job</code>
+
+<code>kubectl logs job/test-job --follow/code>
+
+Model saved to /data/models/logreg_model_20250324_183640.pkl
+
 
 <h1 align="center">Файлы из директории GPU сервера</h1>
 
