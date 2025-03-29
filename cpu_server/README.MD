@@ -216,7 +216,11 @@ WantedBy=multi-user.target</code>
 
 <code>kubectl edit configmap prometheus-server</code> 
 
-<b>4.4 Перезапустим prometheus</b>
+<b>4.4 Применим новый конфиг, а так же postgres-exporter и перезапустим prometheus</b>
+
+<code> kubectl apply -f postgres-exporter-config.yaml</code> 
+
+<code> kubectl apply -f postgres-exporter-deployment.yaml</code> 
 
 <code>kubectl apply -f prometheus-config.yaml</code> 
 
@@ -243,3 +247,19 @@ WantedBy=multi-user.target</code>
 <code>http://31.130.151.173:9090/graph</code> 
 
 ![Alt text](prometheus-graph.png)
+
+
+<b>4.8 Пример метрик Postgres SQL</b>
+
+![Alt text](prometheus-postgres-exporter.png)
+
+
+<b>4.9 Запрос метрик через Prometheus</b>
+
+<code>http://31.130.151.173:9090/graph</code> 
+
+<code>node_cpu_seconds_total</code> 
+
+<code>node_memory_MemFree_bytes</code> 
+
+
