@@ -160,7 +160,7 @@ CPU_FASTAPI_SERV >> PSQL DB >> CPU_FASTAPI_SERV
 
 <b>3.1 Установка Node Exporter</b>
 
-<code>wget https://github.com/prometheus/node_exporter/releases/download/vX.X.X/node_exporter-X.X.X.linux-amd64.tar.gz</code> 
+<code>wget https://github.com/prometheus/node_exporter/releases/download/v1.9.0/node_exporter-1.9.0.linux-amd64.tar.gz</code> 
 
 <b>3.2 Распакуем архив</b>
 
@@ -172,14 +172,21 @@ CPU_FASTAPI_SERV >> PSQL DB >> CPU_FASTAPI_SERV
 
 <code>sudo nano /etc/systemd/system/node-exporter.service</code> 
 
-[Unit]
+<code>[Unit]
+
 Description=Node Exporter
+
 After=network.target
+
 [Service]
+
 User=root
+
 ExecStart=/home/admin/cpu_server/node_exporter-1.9.0.linux-amd64/node_exporter
+
 [Install]
-WantedBy=multi-user.target 
+
+WantedBy=multi-user.target</code> 
 
 <b>3.4 Активируем и првоерим сервис:</b>
 
