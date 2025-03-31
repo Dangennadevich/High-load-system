@@ -248,13 +248,7 @@ WantedBy=multi-user.target</code>
 
 ![Alt text](prometheus-graph.png)
 
-
-<b>4.8 Пример метрик Postgres SQL</b>
-
-![Alt text](prometheus-postgres-exporter.png)
-
-
-<b>4.9 Запрос метрик через Prometheus</b>
+<b>4.8 Запрос метрик через Prometheus</b>
 
 <code>http://31.130.151.173:9090/graph</code> 
 
@@ -262,4 +256,7 @@ WantedBy=multi-user.target</code>
 
 <code>node_memory_MemFree_bytes</code> 
 
+<b>4.9 Пример метрик Postgres SQL</b>
+
+![Alt text](prometheus-postgres-exporter.png)
 
