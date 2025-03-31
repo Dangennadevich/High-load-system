@@ -173,19 +173,12 @@ CPU_FASTAPI_SERV >> PSQL DB >> CPU_FASTAPI_SERV
 <code>sudo nano /etc/systemd/system/node-exporter.service</code> 
 
 <code>[Unit]
-
 Description=Node Exporter
-
 After=network.target
-
 [Service]
-
 User=root
-
 ExecStart=/home/admin/cpu_server/node_exporter-1.9.0.linux-amd64/node_exporter
-
 [Install]
-
 WantedBy=multi-user.target</code> 
 
 <b>3.4 Активируем и првоерим сервис:</b>
